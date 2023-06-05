@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prikaz obroka</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Prikaz obroka</h1>
+  
+  <div id="meals-list"></div>
+
+  <script>
+    function getMeals() {
+      $.ajax({
+        url: "/meal",
+        type: "GET",
+        success: function(response) {
+          if (response.length > 0) {
+            var mealsList = $("#meals-list");
+            mealsList.empty();
+
+            response.forEach(function(meal) {
+              var mealElement = $("<div></div>").text("Obrok: " + meal.name);
+
+              var deleteIcon = $("<i></i>").addClass("fas fa-trash-alt");
+
+              deleteIcon.click(function() {
+                deleteMeal(meal.id);
+              });
+
+              mealElement.append(deleteIcon);
+
+              mealsList.append(mealElement);
+            });
+          } else {
+            $("#meals-list").text("Nema dostupnih obroka.");
+          }
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function deleteMeal(mealId) {
+      $.ajax({
+        url: "/meal/obrisi",
+        type: "DELETE",
+        data: { mealId: mealId },
+        success: function(response) {
+          if (response.response === "Success") {
+            getMeals();
+          } else {
+            console.log(response);
+          }
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      getMeals();
+    });
+  </script>
+</body>
+</html>
