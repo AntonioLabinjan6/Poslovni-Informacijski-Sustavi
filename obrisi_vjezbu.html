@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prikaz vježbi</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Prikaz vježbi</h1>
+  
+  <div id="exercises-list"></div>
+
+  <script>
+    function getExercises() {
+      $.ajax({
+        url: "/exercise",
+        type: "GET",
+        success: function(response) {
+          if (response.length > 0) {
+            var exercisesList = $("#exercises-list");
+            exercisesList.empty();
+
+            response.forEach(function(exercise) {
+              var exerciseElement = $("<div></div>").text("Vježba: " + exercise.name);
+
+              var deleteIcon = $("<i></i>").addClass("fas fa-trash-alt");
+
+              deleteIcon.click(function() {
+                deleteExercise(exercise.id);
+              });
+
+              exerciseElement.append(deleteIcon);
+
+              exercisesList.append(exerciseElement);
+            });
+          } else {
+            $("#exercises-list").text("Nema dostupnih vježbi.");
+          }
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function deleteExercise(exerciseId) {
+      $.ajax({
+        url: "/exercise/obrisi",
+        type: "DELETE",
+        data: { exerciseId: exerciseId },
+        success: function(response) {
+          if (response.response === "Success") {
+            getExercises();
+          } else {
+            console.log(response);
+          }
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      getExercises();
+    });
+  </script>
+</body>
+</html>

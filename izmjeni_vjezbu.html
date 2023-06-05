@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Izmjena vježbe</title>
+    <style>
+        .form-container {
+            width: 300px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .form-group button {
+            padding: 5px 10px;
+        }
+
+        .message {
+            margin-top: 10px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Update Exercise</h2>
+        <div class="form-group">
+            <label>Exercise name:</label>
+            <input type="text" id="exercise_name" required>
+        </div>
+        <div class="form-group">
+            <label>Calories:</label>
+            <input type="number" id="exercise_calories" required>
+        </div>
+        <div class="form-group">
+            <label>Duration (min):</label>
+            <input type="number" id="exercise_duration" required>
+        </div>
+        <div class="form-group">
+            <label>Intensity:</label>
+            <select id="exercise_intensity" required>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <button onclick="updateExercise()">Submit</button>
+        </div>
+        <div class="message" id="response_message"></div>
+    </div>
+
+    <script>
+        function updateExercise() {
+            var exerciseName = document.getElementById("exercise_name").value;
+            var calories = parseFloat(document.getElementById("exercise_calories").value);
+            var duration = parseInt(document.getElementById("exercise_duration").value);
+            var intensity = document.getElementById("exercise_intensity").value;
+
+            var data = {
+                exercise_name: exerciseName,
+                exercise_calories: calories,
+                exercise_duration: duration,
+                exercise_intensity: intensity
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PATCH", "/exercise/izmjeni", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    var response = JSON.parse(xhr.responseText);
+                    var messageContainer = document.getElementById("response_message");
+
+                    if (xhr.status === 200) {
+                        messageContainer.textContent = response.response;
+                        messageContainer.className = "message success";
+                    } else {
+                        messageContainer.textContent = response.response;
+                        messageContainer.className = "message error";
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
